@@ -6,3 +6,6 @@ workers_dev = true
 [build]
 upload_format = "service-worker"
 command = "npm run build"
+
+# [secrets]
+# publicKey
