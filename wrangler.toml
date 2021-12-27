@@ -1,0 +1,8 @@
+name = "kyle-interactions"
+type = "javascript"
+account_id = "db47db45acd22a503f31e76887a98caa"
+workers_dev = true
+
+[build]
+upload_format = "service-worker"
+command = "npm run build"

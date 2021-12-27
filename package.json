@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "discord-api-types": "^0.26.0",
+    "webpack": "^5.65.0",
+    "wrangler": "^0.0.6"
+  },
+  "scripts": {
+    "build": "webpack",
+    "dev": "NODE_ENV=development npm run build"
+  },
+  "browser": {},
+  "devDependencies": {
+    "webpack-cli": "^4.9.1"
+  }
+}
