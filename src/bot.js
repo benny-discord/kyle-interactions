@@ -1,4 +1,5 @@
-const { InteractionType, InteractionResponseType } = require('discord-api-types/v9')
+const { InteractionType, InteractionResponseType } = require('discord-api-types/v9');
+const { verify } = require('./verify.js');
 
 export async function handleRequest(request) {
 	if (!request.headers.get('X-Signature-Ed25519') || !request.headers.get('X-Signature-Timestamp')) return Response.redirect('https://benny.sh')
