@@ -9,3 +9,4 @@ command = "npm run build"
 
 # [secrets]
 # publicKey
+# botToken
