@@ -6,7 +6,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "dev": "NODE_ENV=development npm run build"
+    "deploy": "wrangler publish out.js"
   },
   "browser": {},
   "devDependencies": {

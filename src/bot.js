@@ -1,6 +1,7 @@
 const { InteractionType, InteractionResponseType, RouteBases, Routes } = require('discord-api-types/v9');
 const { verify } = require('./verify.js');
-const config = require('../config/config.json')
+const config = require('../config/config.json');
+const ms = require('./ms.js');
 
 export async function handleRequest(request) {
 	if (!request.headers.get('X-Signature-Ed25519') || !request.headers.get('X-Signature-Timestamp')) return Response.redirect('https://benny.sh')
@@ -114,6 +115,58 @@ export async function handleRequest(request) {
 						content: 'This command is only available to staff',
 					}
 				});
+			
+			case 'timeout':
+				if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member.permissions && (BigInt(interaction.member.permissions) & 0x00000008n) == 0x00000008n) {
+					const options = interaction.data.options,
+						user = options.find(x => x.name == 'user').value,
+						time = options.find(x => x.name == 'time').value,
+						reason = options.find(x => x.name == 'reason')?.value;
+					
+					let muteDuration = ms(time);
+					if (muteDuration > 2419200000) return respond({
+						type: InteractionResponseType.ChannelMessageWithSource,
+						data: {
+							flags: 1 << 6,
+							content: 'Time must be between 1 minute and 28 days'
+						}
+					});
+					if (muteDuration == 0) muteDuration = null;
+
+					const res = await makeAPIRequest(
+						Routes.guildMember(interaction.guild_id, user),
+						'PATCH',
+						{
+							communication_disabled_until: muteDuration ? new Date(Date.now() + muteDuration) : null,
+						},
+						reason ? {
+							'X-Audit-Log-Reason': reason.substring(0, 512)
+						} : undefined
+					);
+					if (!res.ok) return respond({
+						type: InteractionResponseType.ChannelMessageWithSource,
+						data: {
+							flags: 1 << 6,
+							content: 'Failed to timeout user',
+						}
+					});
+					console.log(`time: ${time}: mute duration: ${muteDuration}, com disabled until: ${muteDuration ? new Date(Date.now() + muteDuration) : null}`);
+					console.log(`msmd: ${muteDuration && ms(muteDuration)}`);
+					return respond({
+						type: InteractionResponseType.ChannelMessageWithSource,
+						data: {
+							flags: 1 << 6,
+							content: muteDuration !== null ? `User <@${user}> has been timed out for ${ms(muteDuration)}.` : `User <@${user}> has ended time out.`
+						}
+					});
+				}
+				return respond({
+					type: InteractionResponseType.ChannelMessageWithSource,
+					data: {
+						flags: 1 << 6,
+						content: 'This command is only available to staff',
+					}
+				});
 
 			default:
 				return respond({
@@ -136,8 +189,9 @@ export async function handleRequest(request) {
 
 const respond = (response) => new Response(JSON.stringify(response), { headers: { 'content-type': 'application/json' } });
 
-async function makeAPIRequest(url, method = 'GET', body) {
+async function makeAPIRequest(url, method = 'GET', body, additionalHeaders = {}) {
 	const headers = {
+		...additionalHeaders,
 		'Authorization': `Bot ${botToken}`,
 	}
 	if (body !== undefined) { headers['Content-Type'] = 'application/json'; }
