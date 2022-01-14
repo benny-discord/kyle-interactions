@@ -202,7 +202,7 @@ export async function handleRequest(request) {
 					title: 'Benny Status',
 					url: 'https://benny.sh/status',
 					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString()}**:\nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()}\nUptime: ${ms(data[k].uptime)}`).join('\n\n'),
-					color: 0x77fc8f
+					color: data.forEach(k => {k.status == 0 ? 0x77fc8f : 0xf5bc42})
 				};
 				
 				return respond({
