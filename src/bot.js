@@ -172,16 +172,16 @@ export async function handleRequest(request) {
 				const userFriendly = (code) => {
 					switch (code) {
 						case 0:
-							return "Logging in"
+							return "Logged in"
 						case 1:
 						case 4:
 						case 6:
 						case 7:
-							return "Logging in, different states"
+							return "Logging in"
 						case 9:
-							return "Offline, queued to log in."
+							return "Queued"
 						case 5:
-							return "Disconnected, not queued to log in."
+							return "Disconnected"
 						default:
 							return "Reconnecting"
 					}
@@ -200,7 +200,8 @@ export async function handleRequest(request) {
 
 				const embed = {
 					title: 'Benny Status',
-					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString().toUpperCase()}**: \nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()} \nMembers: ${data[k].members.toString()}\Guilds: ${data[k].guilds.toString()}\nUptime: ${ms(data[k].uptime)}`).join('\n\n'),
+					url: 'https://benny.sh/status',
+					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString()}**:\nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()}\nUptime: ${ms(data[k].uptime)}`).join('\n\n'),
 					color: 0x77fc8f
 				};
 				
