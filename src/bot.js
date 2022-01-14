@@ -200,7 +200,7 @@ export async function handleRequest(request) {
 
 				const embed = {
 					title: 'Benny Status',
-					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString().toUpperCase()}**: \nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()} \nMembers: ${data[k].members.toString()}\Guilds: ${data[k].guilds.toString()}\nUptime: ${data[k].members}`).join('\n\n'),
+					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString().toUpperCase()}**: \nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()} \nMembers: ${data[k].members.toString()}\Guilds: ${data[k].guilds.toString()}\nUptime: ${ms(data[k].uptime)}`).join('\n\n'),
 					color: 0x77fc8f
 				};
 				
