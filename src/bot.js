@@ -201,7 +201,6 @@ export async function handleRequest(request) {
 				const embed = {
 					title: 'Benny Status',
 					url: 'https://benny.sh/status',
-					url: 'https://benny.sh/status',
 					description: data.map(k => `**Shard ${k.id.toString()}**:\nStatus: ${userFriendly(k.status)}\nPing: ${k.ping.toString()}\nUptime: ${ms(k.uptime)}`).join('\n\n'),
 					color: data.find(x => x.status !== 0) ? 0x77fc8f : 0xf5bc42
 					
