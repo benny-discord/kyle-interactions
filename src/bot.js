@@ -196,7 +196,7 @@ export async function handleRequest(request) {
 					}
 				});
 
-				const { data } = json,
+				const { data } = json
 
 				const embed = {
 					title: 'Benny Status',
