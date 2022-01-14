@@ -211,15 +211,15 @@ export async function handleRequest(request) {
 						embeds: [embed],
 					}
 				});
-		default:
-			return respond({
-				type: InteractionResponseType.ChannelMessageWithSource,
-				data: {
-					flags: 1 << 6,
-					content: 'Unknown command',
-				}
-			});
-		}
+			default:
+				return respond({
+					type: InteractionResponseType.ChannelMessageWithSource,
+					data: {
+						flags: 1 << 6,
+						content: 'Unknown command',
+					}
+				});
+			}
 	}
 
 	return respond({
