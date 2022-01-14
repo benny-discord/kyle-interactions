@@ -168,14 +168,57 @@ export async function handleRequest(request) {
 					}
 				});
 
-			default:
+			case "status":
+				const userFriendly = (code) => {
+					switch (code) {
+						case 0:
+							return "Logging in"
+						case 1:
+						case 4:
+						case 6:
+						case 7:
+							return "Logging in, different states"
+						case 9:
+							return "Offline, queued to log in."
+						case 5:
+							return "Disconnected, not queued to log in."
+						default:
+							return "Reconnecting"
+					}
+				}
+
+				const json = await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
+				if (!json || json.status !== 200) return respond({
+					type: InteractionResponseType.ChannelMessageWithSource,
+					data: {
+						flags: 1 << 6,
+						content: 'Status failed to fetch',
+					}
+				});
+
+				const { data } = json,
+
+				const embed = {
+					title: 'Benny Status',
+					description: Object.keys(data).sort().map(k => `**Shard ${data[k].id.toString().toUpperCase()}**: \nStatus: ${userFriendly(data[k].status)}\nPing: ${data[k].ping.toString()} \nMembers: ${data[k].members.toString()}\Guilds: ${data[k].guilds.toString()}\nUptime: ${data[k].members}`).join('\n\n'),
+					color: 0x77fc8f
+				};
+				
 				return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
 					data: {
 						flags: 1 << 6,
-						content: 'Unknown command',
+						embeds: [embed],
 					}
 				});
+		default:
+			return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Unknown command',
+				}
+			});
 		}
 	}
 
