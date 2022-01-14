@@ -37,10 +37,10 @@ export async function handleRequest(request) {
 				return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
 					data: {
-						flags: 1 << 6,
 						embeds: [embed]
 					}
 				});
+
 			case 'support':
 				if (interaction.guild_id !== config.mainGuildID) return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
@@ -115,14 +115,14 @@ export async function handleRequest(request) {
 						content: 'This command is only available to staff',
 					}
 				});
-			
+
 			case 'timeout':
 				if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member.permissions && (BigInt(interaction.member.permissions) & 0x00000008n) == 0x00000008n) {
 					const options = interaction.data.options,
 						user = options.find(x => x.name == 'user').value,
 						time = options.find(x => x.name == 'time').value,
 						reason = options.find(x => x.name == 'reason')?.value;
-					
+
 					let muteDuration = ms(time);
 					if (muteDuration > 2419200000) return respond({
 						type: InteractionResponseType.ChannelMessageWithSource,
@@ -187,8 +187,8 @@ export async function handleRequest(request) {
 					}
 				}
 
-				const json = await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
-				if (!json || json.status !== 200) return respond({
+				const res = await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
+				if (!res || res.status !== 200) return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
 					data: {
 						flags: 1 << 6,
@@ -196,22 +196,26 @@ export async function handleRequest(request) {
 					}
 				});
 
-				const { data } = json
+				const { data: statusData } = res;
 
-				const embed = {
-					title: 'Benny Status',
+				const statusEmbed = {
+					title: `Benny Status (${statusData.filter(x => x.status == 0).length}/${statusData.length})`,
 					url: 'https://benny.sh/status',
-					description: data.map(k => `**Shard ${k.id.toString()}**:\nStatus: ${userFriendly(k.status)}\nPing: ${k.ping.toString()}\nUptime: ${ms(k.uptime)}`).join('\n\n'),
-					color: data.find(x => x.status !== 0) ? 0x77fc8f : 0xf5bc42
+					fields: statusData.map(k => ({
+						name: `**Shard ${k.id.toString()}**`,
+						value: `Status: ${userFriendly(k.status)}\nPing: ${k.ping.toString()}\nUptime: ${ms(k.uptime)}`,
+						inline: true
+					})),
+					color: statusData.find(x => x.status !== 0) ? 0xf5bc42 : 0x77fc8f
 				};
-				
+
 				return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
 					data: {
-						flags: 1 << 6,
-						embeds: [embed],
+						embeds: [statusEmbed],
 					}
 				});
+
 			default:
 				return respond({
 					type: InteractionResponseType.ChannelMessageWithSource,
@@ -220,7 +224,7 @@ export async function handleRequest(request) {
 						content: 'Unknown command',
 					}
 				});
-			}
+		}
 	}
 
 	return respond({
