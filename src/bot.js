@@ -203,7 +203,7 @@ export async function handleRequest(request) {
 					url: 'https://benny.sh/status',
 					fields: statusData.map(k => ({
 						name: `**Shard ${k.id.toString()}**`,
-						value: `Status: ${userFriendly(k.status)}\nPing: ${k.ping.toString()}\nUptime: ${ms(k.uptime)}`,
+						value: `Status: ${userFriendly(k.status)}${k.status == 0 ? `\nPing: ${k.ping.toString()}\nUptime: ${ms(k.uptime)}` : ''}`,
 						inline: true
 					})),
 					color: statusData.find(x => x.status !== 0) ? 0xf5bc42 : 0x77fc8f
