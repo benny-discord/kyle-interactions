@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "discord-api-types": "^0.26.0",
-    "webpack": "^5.65.0",
+    "esbuild": "^0.14.11",
     "wrangler": "^0.0.6"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "esbuild --bundle --minify --outfile=./out.js ./src/index.js",
     "deploy": "wrangler publish out.js"
   },
   "browser": {},
