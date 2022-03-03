@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "discord-api-types": "^0.26.0",
-    "esbuild": "^0.14.11",
-    "wrangler": "^0.0.6"
+    "discord-api-types": "^0.27.3",
+    "esbuild": "^0.14.24",
+    "wrangler": "^0.0.17"
   },
   "scripts": {
     "build": "esbuild --bundle --minify --outfile=./out.js ./src/index.ts",
@@ -11,6 +11,6 @@
   "browser": {},
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.2"
   }
 }
