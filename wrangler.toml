@@ -2,11 +2,27 @@ name = "kyle-interactions"
 type = "javascript"
 account_id = "db47db45acd22a503f31e76887a98caa"
 workers_dev = true
+kv_namespaces = [
+	{ binding = "GRAPH_STORAGE", id = "bca01fcb9e5841b387acfcfe5573c549", preview_id = "bca01fcb9e5841b387acfcfe5573c549" }
+]
+compatibility_date = "2022-03-05"
 
 [build]
-upload_format = "service-worker"
 command = "npm run build"
+
+[build.upload]
+format = "service-worker"
+main = "./dist/out.js"
+
+[triggers]
+crons = ["0 * * * *"]
 
 # [secrets]
 # publicKey
 # botToken
+
+[miniflare]
+watch = true
+live_reload = true
+env_path = ".env"
+cf_fetch = false

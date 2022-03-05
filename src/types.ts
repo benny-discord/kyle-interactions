@@ -1,6 +1,7 @@
 declare global {
 	const botToken: string
 	const publicKey: string
+	const GRAPH_STORAGE: KVNamespace
 }
 
 export interface BennyTranslationStatus {
@@ -27,6 +28,12 @@ export interface Config {
 	mainGuildID: string
 	staffRoleIDs: string[]
 	supportRoleID: string
+}
+
+export interface GraphListResponse {
+	name: string
+	expiration: number
+	metadata: { value: number }
 }
 
 export { }

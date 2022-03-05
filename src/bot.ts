@@ -1,11 +1,19 @@
 import { APIRole, APIInteraction, APIInteractionResponse, APIApplicationCommandInteractionDataOption, APIChatInputApplicationCommandGuildInteraction, APIApplicationCommandInteractionDataUserOption, APIApplicationCommandInteractionDataStringOption, InteractionType, InteractionResponseType, RouteBases, Routes, RESTGetAPIGuildRolesResult } from "discord-api-types/v9";
-import { BennyTranslationStatus, BennyStatusResponse, Shard } from "./types";
+import { BennyTranslationStatus, BennyStatusResponse, Shard, GraphListResponse } from "./types";
 import { verify } from './verify.js';
 import { formatToString, parseToNumber } from './ms.js';
 import * as config from '../config/config.json';
 
 
 export async function handleRequest(request: Request): Promise<Response> {
+	const url = new URL(request.url)
+	if (url.pathname == '/graph') {
+		const value = await GRAPH_STORAGE.list()
+		const data = <{ [key: string]: number }>{}
+		const keys = <GraphListResponse[]>value.keys
+		keys.forEach(x => data[x.name] = x.metadata.value);
+		return new Response(JSON.stringify(data))
+	}
 	if (!request.headers.get('X-Signature-Ed25519') || !request.headers.get('X-Signature-Timestamp')) return Response.redirect('https://benny.sh')
 	if (!await verify(request)) return new Response('', { status: 401 })
 

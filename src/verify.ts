@@ -6,13 +6,11 @@ function hex2bin(hex: string) {
 	return buf;
 }
 
+// @ts-expect-error Node.js needs to know this is a public key
 const PUBLIC_KEY = crypto.subtle.importKey(
 	'raw',
 	hex2bin(publicKey),
-	{
-		name: 'NODE-ED25519',
-		namedCurve: 'NODE-ED25519',
-	},
+	{ name: 'NODE-ED25519', namedCurve: 'NODE-ED25519', public: true },
 	true,
 	['verify'],
 );

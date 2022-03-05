@@ -1,16 +1,16 @@
 {
   "dependencies": {
-    "discord-api-types": "^0.27.3",
-    "esbuild": "^0.14.24",
-    "wrangler": "^0.0.17"
+    "discord-api-types": "^0.27.3"
   },
   "scripts": {
-    "build": "esbuild --bundle --minify --outfile=./out.js ./src/index.ts",
-    "deploy": "wrangler publish out.js"
+    "build": "esbuild --bundle --minify --outfile=./dist/out.js ./src/index.ts",
+    "deploy": "wrangler publish dist/out.js"
   },
-  "browser": {},
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
-    "webpack-cli": "^4.9.2"
+    "dotenv": "^16.0.0",
+    "esbuild": "^0.14.25",
+    "miniflare": "^2.3.0",
+    "wrangler": "^0.0.17"
   }
 }
