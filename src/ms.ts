@@ -1,5 +1,4 @@
 export function parseToNumber(str: string): number | null {
-	str = String(str);
 	if (str.length > 50) return 0;
 
 	const matches = str.match(/(-?(?:\d+)?.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|months?|mon|years?|yrs?|y)/gi);

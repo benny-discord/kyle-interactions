@@ -1,5 +1,5 @@
-import { APIRole, APIInteraction, APIInteractionResponse, APIApplicationCommandInteractionDataOption, APIChatInputApplicationCommandGuildInteraction, APIApplicationCommandInteractionDataUserOption, APIApplicationCommandInteractionDataStringOption, InteractionType, InteractionResponseType, RouteBases, Routes, RESTGetAPIGuildRolesResult } from "discord-api-types/v9";
-import { BennyTranslationStatus, BennyStatusResponse, Shard, GraphListResponse } from "./types";
+import { APIApplicationCommandInteractionDataOption, APIApplicationCommandInteractionDataStringOption, APIApplicationCommandInteractionDataUserOption, APIChatInputApplicationCommandGuildInteraction, APIEmbed, APIInteraction, APIInteractionResponse, APIRole, InteractionResponseType, InteractionType, RESTGetAPIGuildRolesResult, RouteBases, Routes } from "discord-api-types/v9";
+import { BennyStatusResponse, BennyTranslationStatus, GraphListResponse, Shard } from "./types";
 import { verify } from './verify.js';
 import { formatToString, parseToNumber } from './ms.js';
 import * as config from '../config/config.json';
@@ -46,7 +46,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 					total = data.en;
 				delete data.en;
 
-				const embed = {
+				const embed = <APIEmbed>{
 					title: `Translation Status - ${total} total`,
 					description: Object.keys(data).sort().map(k => `**${k.toUpperCase()}**: ${data[k]}/${total} (${Math.round(data[k] / total * 1000) / 10}%)${data[k] === total ? ' <:verified:703946320670621716>' : ''}`).join('\n'),
 					color: 0x77fc8f
@@ -195,7 +195,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 					return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' } });
 				}
 
-				const statusEmbed = {
+				const statusEmbed = <APIEmbed>{
 					title: `Benny Status (${statusData.filter(x => x.status == 0).length}/${statusData.length})`,
 					url: 'https://benny.sh/status',
 					fields: statusData.map(k => ({
