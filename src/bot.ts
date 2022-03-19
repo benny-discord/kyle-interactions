@@ -1,9 +1,8 @@
-import { APIApplicationCommandInteractionDataOption, APIApplicationCommandInteractionDataStringOption, APIApplicationCommandInteractionDataUserOption, APIChatInputApplicationCommandGuildInteraction, APIEmbed, APIInteraction, APIInteractionResponse, APIRole, InteractionResponseType, InteractionType, RESTGetAPIGuildRolesResult, RouteBases, Routes } from "discord-api-types/v9";
+import { APIApplicationCommandInteractionDataStringOption, APIApplicationCommandInteractionDataUserOption, APIChatInputApplicationCommandGuildInteraction, APIEmbed, APIInteraction, APIInteractionResponse, InteractionResponseType, InteractionType, RESTGetAPIGuildRolesResult, RouteBases, Routes } from "discord-api-types/v10";
 import { BennyStatusResponse, BennyTranslationStatus, GraphListResponse, Shard } from "./types";
 import { verify } from './verify.js';
 import { formatToString, parseToNumber } from './ms.js';
 import * as config from '../config/config.json';
-
 
 export async function handleRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url)
@@ -103,7 +102,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 						}
 					});
 					const roles = <RESTGetAPIGuildRolesResult>await res.json(),
-						everyone = <APIRole>roles.find(x => x.id === config.mainGuildID),
+						everyone = roles.find(x => x.id === config.mainGuildID)!,
 						everyoneHasSendMessages = (BigInt(everyone.permissions) & 0x00000800n) == 0x00000800n;
 
 					let newValue = everyoneHasSendMessages ? BigInt(everyone.permissions) - 0x00000800n : BigInt(everyone.permissions) + 0x00000800n;
@@ -135,7 +134,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 			case 'timeout':
 				if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member.permissions && (BigInt(interaction.member.permissions) & 0x00000008n) == 0x00000008n) {
-					const options = ((interaction as APIChatInputApplicationCommandGuildInteraction).data.options as APIApplicationCommandInteractionDataOption[]),
+					const options = (interaction as APIChatInputApplicationCommandGuildInteraction).data.options!,
 						user = (options.find(x => x.name == 'user') as APIApplicationCommandInteractionDataUserOption).value,
 						time = (options.find(x => x.name == 'time') as APIApplicationCommandInteractionDataStringOption).value,
 						reason = (options.find(x => x.name == 'reason') as APIApplicationCommandInteractionDataStringOption | undefined)?.value;
@@ -168,8 +167,6 @@ export async function handleRequest(request: Request): Promise<Response> {
 							content: 'Failed to timeout user',
 						}
 					});
-					console.log(`time: ${time}: mute duration: ${muteDuration}, com disabled until: ${muteDuration ? new Date(Date.now() + muteDuration) : null}`);
-					console.log(`msmd: ${muteDuration && formatToString(muteDuration)}`);
 					return respond({
 						type: InteractionResponseType.ChannelMessageWithSource,
 						data: {
@@ -188,7 +185,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 			case "status":
 				const res = <BennyStatusResponse>await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
-				if (!res || res.status !== 200) return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' }});
+				if (res?.status !== 200) return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' }});
 
 				const { data: statusData } = res;
 				if (statusData === undefined) {
@@ -231,11 +228,9 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 const respond = (response: APIInteractionResponse) => new Response(JSON.stringify(response), { headers: { 'content-type': 'application/json' } });
 
-type HeaderMap = { [key: string]: string };
-
-async function makeAPIRequest(url: string, method: string = 'GET', body?: any, additionalHeaders?: HeaderMap) {
+async function makeAPIRequest(url: string, method: string = 'GET', body?: any, additionalHeaders?: { [key: string]: string }) {
 	if (!additionalHeaders) additionalHeaders = {};
-	const headers = <HeaderMap>{
+	const headers = <{ [key: string]: string }>{
 		...additionalHeaders,
 		'Authorization': `Bot ${botToken}`,
 	}
