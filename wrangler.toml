@@ -1,18 +1,15 @@
 name = "kyle-interactions"
-type = "javascript"
 account_id = "db47db45acd22a503f31e76887a98caa"
 workers_dev = true
 kv_namespaces = [
-	{ binding = "GRAPH_STORAGE", id = "2063fcb6d8424e5d99c2c922beacf826", preview_id = "bca01fcb9e5841b387acfcfe5573c549" }
+	{ binding = "GRAPH_STORAGE", id = "2063fcb6d8424e5d99c2c922beacf826", preview_id = "2063fcb6d8424e5d99c2c922beacf826" }
 ]
-compatibility_date = "2022-03-05"
+compatibility_date = "2022-04-11"
+main = "./dist/out.js"
 
 [build]
 command = "npm run build"
 
-[build.upload]
-format = "service-worker"
-main = "./dist/out.js"
 
 [triggers]
 crons = ["0 * * * *"]

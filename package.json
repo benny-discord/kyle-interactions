@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "discord-api-types": "^0.27.3"
+    "discord-api-types": "^0.31.1"
   },
   "scripts": {
     "build": "esbuild --bundle --minify --outfile=./dist/out.js ./src/index.ts",
@@ -9,8 +9,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^3.4.0",
     "dotenv": "^16.0.0",
-    "esbuild": "^0.14.25",
-    "miniflare": "^2.3.0",
-    "wrangler": "^0.0.17"
+    "esbuild": "^0.14.34",
+    "miniflare": "^2.4.0",
+    "wrangler": "^0.0.25"
   }
 }
