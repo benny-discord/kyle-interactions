@@ -1,5 +1,5 @@
 import { APIApplicationCommandInteractionDataStringOption, APIApplicationCommandInteractionDataUserOption, APIChatInputApplicationCommandGuildInteraction, APIEmbed, APIInteraction, APIInteractionResponse, InteractionResponseType, InteractionType, RESTGetAPIGuildRolesResult, RouteBases, Routes } from "discord-api-types/v10";
-import { BennyStatusResponse, BennyTranslationStatus, GraphListResponse, Shard } from "./types";
+import { BennyStatusResponse, BennyTranslationStatus, Shard } from "./types";
 import { verify } from './verify.js';
 import { formatToString, parseToNumber } from './ms.js';
 import * as config from '../config/config.json';
@@ -7,10 +7,10 @@ import * as config from '../config/config.json';
 export async function handleRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url)
 	if (url.pathname == '/graph') {
-		const value = await GRAPH_STORAGE.list()
-		const data = <{ [key: string]: number }>{}
-		const keys = <GraphListResponse[]>value.keys
-		keys.forEach(x => data[x.name] = x.metadata.value);
+		const value = await GRAPH_STORAGE.list<{ value: number }>()
+		const data: { [key: string]: number } = {}
+		value.keys.forEach(x => data[x.name] = x.metadata!.value);
+		
 		return new Response(JSON.stringify(data))
 	}
 	if (!request.headers.get('X-Signature-Ed25519') || !request.headers.get('X-Signature-Timestamp')) return Response.redirect('https://benny.sh')

@@ -30,10 +30,4 @@ export interface Config {
 	supportRoleID: string
 }
 
-export interface GraphListResponse {
-	name: string
-	expiration: number
-	metadata: { value: number }
-}
-
 export { }
