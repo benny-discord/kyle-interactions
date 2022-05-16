@@ -18,10 +18,12 @@
 	},
 	"include": [
 		"./src/*.ts",
+		"./src/routes/*.ts",
+		"./src/utils/*.ts",
 		"./node_modules/@cloudflare/workers-types/index.d.ts"
-	],
+],
 	"exclude": [
 		"node_modules/",
-		"out.js"
+		"dist/"
 	]
 }

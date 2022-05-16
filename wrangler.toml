@@ -10,7 +10,6 @@ main = "./dist/out.js"
 [build]
 command = "npm run build"
 
-
 [triggers]
 crons = ["0 * * * *"]
 

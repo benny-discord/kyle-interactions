@@ -1,7 +1,7 @@
-declare global {
-	const botToken: string
-	const publicKey: string
-	const GRAPH_STORAGE: KVNamespace
+export interface reqEnv {
+	GRAPH_STORAGE: KVNamespace
+	botToken: string
+	publicKey: string
 }
 
 export interface BennyTranslationStatus {
