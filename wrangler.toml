@@ -8,9 +8,3 @@ compatibility_date = "2022-04-11"
 
 [triggers]
 crons = ["0 * * * *"]
-
-[miniflare]
-watch = true
-live_reload = true
-env_path = ".env"
-cf_fetch = false

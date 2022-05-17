@@ -4,7 +4,8 @@
     "itty-router": "^2.6.1"
   },
   "scripts": {
-    "deploy": "wrangler publish --format=modules"
+    "deploy": "wrangler publish --format=modules",
+    "test": "npx wrangler publish ./src/index.ts --format=modules --dry-run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.10.0",
