@@ -5,17 +5,9 @@ kv_namespaces = [
 	{ binding = "GRAPH_STORAGE", id = "2063fcb6d8424e5d99c2c922beacf826", preview_id = "2063fcb6d8424e5d99c2c922beacf826" }
 ]
 compatibility_date = "2022-04-11"
-main = "./dist/out.js"
-
-[build]
-command = "npm run build"
 
 [triggers]
 crons = ["0 * * * *"]
-
-# [secrets]
-# publicKey
-# botToken
 
 [miniflare]
 watch = true

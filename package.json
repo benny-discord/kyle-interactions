@@ -4,8 +4,7 @@
     "itty-router": "^2.6.1"
   },
   "scripts": {
-    "build": "esbuild --bundle --minify --outfile=./dist/out.js ./src/index.ts",
-    "deploy": "wrangler publish dist/out.js"
+    "deploy": "wrangler publish --format=modules"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.10.0",
