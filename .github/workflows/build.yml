@@ -16,5 +16,7 @@ jobs:
 
       - run: npm install
 
-      - name: npm build
-        run: npm run build
+      - name: npm test
+        run: npm test
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
