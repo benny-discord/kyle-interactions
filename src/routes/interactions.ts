@@ -58,130 +58,104 @@ export default async function (request: Request, env: reqEnv): Promise<Response>
 					content: 'This command is only available in the main server'
 				}
 			});
-			if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member!.permissions && (BigInt(interaction.member!.permissions) & 0x00000008n) == 0x00000008n) {
-				let method = interaction.member!.roles.includes(config.supportRoleID) ? 'DELETE' : 'PUT';
-				const res = await makeAPIRequest(Routes.guildMemberRole(config.mainGuildID, interaction.member!.user.id, config.supportRoleID), method);
-				if (res.status !== 204) return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: 'Failed to update support role',
-					}
-				});
-				return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: `Support role ${method === 'PUT' ? 'added' : 'removed'}`
-					}
-				});
-			}
+			let method = interaction.member!.roles.includes(config.supportRoleID) ? 'DELETE' : 'PUT';
+			const res = await makeAPIRequest(Routes.guildMemberRole(config.mainGuildID, interaction.member!.user.id, config.supportRoleID), method);
+			if (res.status !== 204) return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Failed to update support role',
+				}
+			});
 			return respond({
 				type: InteractionResponseType.ChannelMessageWithSource,
 				data: {
 					flags: 1 << 6,
-					content: 'This command is only available to staff',
+					content: `Support role ${method === 'PUT' ? 'added' : 'removed'}`
 				}
 			});
 
-		case 'lock':
-			if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member!.permissions && (BigInt(interaction.member!.permissions) & 0x00000008n) == 0x00000008n) {
-				const res = await makeAPIRequest(Routes.guildRoles(config.mainGuildID), env.botToken);
-				if (!res.ok) return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: 'Failed to fetch roles',
-					}
-				});
-				const roles = <RESTGetAPIGuildRolesResult>await res.json(),
-					everyone = roles.find(x => x.id === config.mainGuildID)!,
-					everyoneHasSendMessages = (BigInt(everyone.permissions) & 0x00000800n) == 0x00000800n;
 
-				let newValue = everyoneHasSendMessages ? BigInt(everyone.permissions) - 0x00000800n : BigInt(everyone.permissions) + 0x00000800n;
-				const patchRes = await makeAPIRequest(Routes.guildRole(config.mainGuildID, config.mainGuildID), env.botToken, 'PATCH', {
-					permissions: newValue.toString()
-				});
-				if (!patchRes.ok) return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: 'Failed to update role',
-					}
-				});
-				return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: `Everyone role permissions updated to ${everyoneHasSendMessages ? 'deny' : 'allow'} sending messages`
-					}
-				});
-			}
+		case 'lock':
+			const getRoles = await makeAPIRequest(Routes.guildRoles(config.mainGuildID), env.botToken);
+			if (!getRoles.ok) return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Failed to fetch roles',
+				}
+			});
+			const roles: RESTGetAPIGuildRolesResult = await getRoles.json(),
+				everyone = roles.find(x => x.id === config.mainGuildID)!,
+				everyoneHasSendMessages = (BigInt(everyone.permissions) & 0x00000800n) == 0x00000800n;
+
+			let newValue = everyoneHasSendMessages ? BigInt(everyone.permissions) - 0x00000800n : BigInt(everyone.permissions) + 0x00000800n;
+			const patchRes = await makeAPIRequest(Routes.guildRole(config.mainGuildID, config.mainGuildID), env.botToken, 'PATCH', {
+				permissions: newValue.toString()
+			});
+			if (!patchRes.ok) return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Failed to update role',
+				}
+			});
 			return respond({
 				type: InteractionResponseType.ChannelMessageWithSource,
 				data: {
 					flags: 1 << 6,
-					content: 'This command is only available to staff',
+					content: `Everyone role permissions updated to ${everyoneHasSendMessages ? 'deny' : 'allow'} sending messages`
 				}
 			});
 
 		case 'timeout':
-			if (interaction.member?.roles.some(x => config.staffRoleIDs.includes(x)) || interaction.member!.permissions && (BigInt(interaction.member!.permissions) & 0x00000008n) == 0x00000008n) {
-				const options = (interaction as APIChatInputApplicationCommandGuildInteraction).data.options!,
-					user = (options.find(x => x.name == 'user') as APIApplicationCommandInteractionDataUserOption).value,
-					time = (options.find(x => x.name == 'time') as APIApplicationCommandInteractionDataStringOption).value,
-					reason = (options.find(x => x.name == 'reason') as APIApplicationCommandInteractionDataStringOption | undefined)?.value;
+			const options = (interaction as APIChatInputApplicationCommandGuildInteraction).data.options!,
+				user = (options.find(x => x.name == 'user') as APIApplicationCommandInteractionDataUserOption).value,
+				time = (options.find(x => x.name == 'time') as APIApplicationCommandInteractionDataStringOption).value,
+				reason = (options.find(x => x.name == 'reason') as APIApplicationCommandInteractionDataStringOption | undefined)?.value;
 
-				let muteDuration = parseToNumber(time);
-				if (muteDuration == 0) muteDuration = null;
-				if (muteDuration && muteDuration > 2419200000) return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: 'Time must be between 1 minute and 28 days'
-					}
-				});
+			let muteDuration = parseToNumber(time);
+			if (muteDuration == 0) muteDuration = null;
+			if (muteDuration && muteDuration > 2419200000) return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Time must be between 1 minute and 28 days'
+				}
+			});
 
 
-				const res = await makeAPIRequest(
-					Routes.guildMember(interaction.guild_id!, user),
-					env.botToken,
-					'PATCH',
-					{
-						communication_disabled_until: muteDuration ? new Date(Date.now() + muteDuration) : null,
-					},
-					reason ? {
-						'X-Audit-Log-Reason': reason.substring(0, 512)
-					} : undefined
-				);
-				if (!res.ok) return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: 'Failed to timeout user',
-					}
-				});
-				return respond({
-					type: InteractionResponseType.ChannelMessageWithSource,
-					data: {
-						flags: 1 << 6,
-						content: muteDuration !== null ? `User <@${user}> has been timed out for ${formatToString(muteDuration)}.` : `User <@${user}> has ended time out.`
-					}
-				});
-			}
+			const memberPatch = await makeAPIRequest(
+				Routes.guildMember(interaction.guild_id!, user),
+				env.botToken,
+				'PATCH',
+				{
+					communication_disabled_until: muteDuration ? new Date(Date.now() + muteDuration) : null,
+				},
+				reason ? {
+					'X-Audit-Log-Reason': reason.substring(0, 512)
+				} : undefined
+			);
+			if (!memberPatch.ok) return respond({
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					flags: 1 << 6,
+					content: 'Failed to timeout user',
+				}
+			});
 			return respond({
 				type: InteractionResponseType.ChannelMessageWithSource,
 				data: {
 					flags: 1 << 6,
-					content: 'This command is only available to staff',
+					content: muteDuration !== null ? `User <@${user}> has been timed out for ${formatToString(muteDuration)}.` : `User <@${user}> has ended time out.`
 				}
 			});
 
 		case "status":
-			const res = <BennyStatusResponse>await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
-			if (res?.status !== 200) return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' } });
+			const statusFetch = <BennyStatusResponse>await fetch('https://api.benny.sh/status').then(r => r.json()).catch(() => null);
+			if (statusFetch?.status !== 200) return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' } });
 
-			const { data: statusData } = res;
+			const { data: statusData } = statusFetch;
 			if (statusData === undefined) {
 				return respond({ type: InteractionResponseType.ChannelMessageWithSource, data: { flags: 1 << 6, content: 'Status failed to fetch' } });
 			}
