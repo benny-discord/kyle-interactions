@@ -59,12 +59,12 @@ export default async function (request: Request, env: reqEnv): Promise<Response>
 				}
 			});
 			let method = interaction.member!.roles.includes(config.supportRoleID) ? 'DELETE' : 'PUT';
-			const res = await makeAPIRequest(Routes.guildMemberRole(config.mainGuildID, interaction.member!.user.id, config.supportRoleID), method);
+			const res = await makeAPIRequest(Routes.guildMemberRole(config.mainGuildID, interaction.member!.user.id, config.supportRoleID), env.botToken, method);
 			if (res.status !== 204) return respond({
 				type: InteractionResponseType.ChannelMessageWithSource,
 				data: {
 					flags: 1 << 6,
-					content: 'Failed to update support role',
+					content: `Failed to update support role (${res.status})`,
 				}
 			});
 			return respond({
